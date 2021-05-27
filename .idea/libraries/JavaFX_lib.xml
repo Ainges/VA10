@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="JavaFX_lib">
+    <CLASSES>
+      <root url="file://$USER_HOME$/OneDrive/Studium/Semester 2/Java II/Praktikum/JavaFX/javafx-sdk-11.0.2/JavaFX_lib" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="file://$USER_HOME$/OneDrive/Studium/Semester 2/Java II/Praktikum/JavaFX/javafx-sdk-11.0.2/JavaFX_lib" />
+    </SOURCES>
+    <jarDirectory url="file://$USER_HOME$/OneDrive/Studium/Semester 2/Java II/Praktikum/JavaFX/javafx-sdk-11.0.2/JavaFX_lib" recursive="false" />
+    <jarDirectory url="file://$USER_HOME$/OneDrive/Studium/Semester 2/Java II/Praktikum/JavaFX/javafx-sdk-11.0.2/JavaFX_lib" recursive="false" type="SOURCES" />
+  </library>
+</component>
