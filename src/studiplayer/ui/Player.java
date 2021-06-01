@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import studiplayer.audio.*;
 
+
 import java.net.URL;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class Player extends Application {
         String SongDescription = "no current song"; //TODO: change to current Title of the song
         Label songlabel = new Label(PREFIX_FOR_CURRENT_SONG + SongDescription);
 
-        if (parameters != null || !parameters.isEmpty()){
+        if (parameters.size() != 0){
 
             String sparameters;
             sparameters = parameters.toString();
@@ -82,7 +83,49 @@ public class Player extends Application {
         ButtonBox.getChildren().addAll(playTime,playButton, pauseButton, stopButton, nextButton, editorButton);
         mainPane.setCenter(ButtonBox);
         primaryStage.show();
+
+        playButton.setOnAction(e -> {
+            playCurrentSong();
+        });
+        pauseButton.setOnAction(e -> {
+            pauseCurrentSong();
+        });
+        stopButton.setOnAction(e -> {
+            stopCurrentSong();
+        });
+        nextButton.setOnAction(e -> {
+            nextSong();
+        });
+        editorButton.setOnAction(e -> {
+           // editCurrentPlaylist(); // Wird in der letzten Teilaufgabe implementiert
+        });
     }
+
+    private void playCurrentSong() {
+       System.out.println( "Playing " + playlist.getCurrentAudioFile().toString());
+       System.out.println("Filename is " +playlist.getCurrentAudioFile().getFilename());
+       System.out.println("Index is " + playlist.getCurrent());
+    }
+
+    private void pauseCurrentSong(){
+        System.out.println("Pausing" + playlist.getCurrentAudioFile().toString());
+        System.out.println("Filename is " +playlist.getCurrentAudioFile().getFilename());
+        System.out.println("Index is " + playlist.getCurrent());
+    }
+
+    private void stopCurrentSong(){
+        System.out.println("Stoping " + playlist.getCurrentAudioFile().toString());
+        System.out.println("Filename is " +playlist.getCurrentAudioFile().getFilename());
+        System.out.println("Index is " + playlist.getCurrent());
+    }
+
+    private void nextSong(){
+        playlist.changeCurrent();
+        System.out.println("Switching to next Audiofile " + playlist.getCurrentAudioFile().toString());
+        System.out.println("Filename is " +playlist.getCurrentAudioFile().getFilename());
+        System.out.println("Index is " + playlist.getCurrent());
+    }
+
 
     private Button createButton(String iconfile){
         Button button = null;
