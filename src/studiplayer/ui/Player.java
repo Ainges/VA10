@@ -11,8 +11,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import studiplayer.audio.*;
 
 import java.net.URL;
+import java.util.List;
 
 import static javafx.application.Application.launch;
 
@@ -23,6 +25,14 @@ public class Player extends Application {
     private Button stopButton;
     private Button nextButton;
     private Button editorButton;
+    private PlayList playlist;
+    private String PlayListPathname; //Name was given (playListPathname?)
+
+    public static final String DEFAULT_PLAYLIST = "playlists/DefaultPlayList.m3u";
+    private static final String INITIAL_PLAYTIME = "00:00";
+    private static final String PREFIX_FOR_CURRENT_SONG = "Current song: ";
+    private static final String NO_CURRENT_SONG = "no current song";
+    private static final String NO_PLAYTIME = "--:--";
 
     public Player(){
     }
@@ -34,7 +44,31 @@ public class Player extends Application {
         stopButton = createButton("stop.png");
         nextButton = createButton("next.png");
         editorButton = createButton("pl_editor.png");
-        Label playTime = new Label("--.--"); //TODO: Change to actual String
+        Label playTime = new Label(INITIAL_PLAYTIME); //TODO: Change to actual String
+        playlist = new PlayList();
+
+
+        List<String> parameters = getParameters().getRaw();
+        String SongDescription = "no current song"; //TODO: change to current Title of the song
+        Label songlabel = new Label(PREFIX_FOR_CURRENT_SONG + SongDescription);
+
+        if (parameters != null || !parameters.isEmpty()){
+
+            String sparameters;
+            sparameters = parameters.toString();
+
+            SongDescription = parameters.toString();
+
+            PlayListPathname = sparameters;
+            playlist.loadFromM3U(sparameters);
+        }
+
+        else {
+            playlist.loadFromM3U(DEFAULT_PLAYLIST);
+            playTime.setText(NO_PLAYTIME);
+            primaryStage.setTitle(NO_CURRENT_SONG);
+
+        }
 
         BorderPane mainPane = new BorderPane();
         HBox ButtonBox = new HBox();
@@ -42,10 +76,8 @@ public class Player extends Application {
         Scene scene = new Scene(mainPane, 700, 90);
         primaryStage.setScene(scene);
 
-        String SongDescription = "no current song"; //TODO: change to current Title of the song
         primaryStage.setTitle(SongDescription);
 
-        Label songlabel = new Label(SongDescription);
         mainPane.setTop(songlabel);
         ButtonBox.getChildren().addAll(playTime,playButton, pauseButton, stopButton, nextButton, editorButton);
         mainPane.setCenter(ButtonBox);
