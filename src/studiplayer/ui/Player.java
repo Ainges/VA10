@@ -1,6 +1,7 @@
 package studiplayer.ui;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
@@ -8,16 +9,13 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
-import studiplayer.audio.*;
-
+import studiplayer.audio.AudioFile;
+import studiplayer.audio.PlayList;
 
 import java.net.URL;
 import java.util.List;
-
-import static javafx.application.Application.launch;
 
 public class Player extends Application {
 
@@ -28,6 +26,10 @@ public class Player extends Application {
     private Button editorButton;
     private PlayList playlist;
     private String PlayListPathname; //Name was given (playListPathname?)
+    private String SongDescription = NO_CURRENT_SONG;
+    private Label playTime = new Label(INITIAL_PLAYTIME);
+    private Label songlabel;
+    private boolean stopped;
 
     public static final String DEFAULT_PLAYLIST = "playlists/DefaultPlayList.m3u";
     private static final String INITIAL_PLAYTIME = "00:00";
@@ -35,25 +37,25 @@ public class Player extends Application {
     private static final String NO_CURRENT_SONG = "no current song";
     private static final String NO_PLAYTIME = "--:--";
 
-    public Player(){
+    public Player() {
     }
+
     //@Override
-    public void start(Stage primaryStage) throws Exception{
+    public void start(Stage primaryStage) throws Exception {
 
         playButton = createButton("play.png");
         pauseButton = createButton("pause.png");
         stopButton = createButton("stop.png");
         nextButton = createButton("next.png");
         editorButton = createButton("pl_editor.png");
-        Label playTime = new Label(INITIAL_PLAYTIME); //TODO: Change to actual String
+
         playlist = new PlayList();
 
 
         List<String> parameters = getParameters().getRaw();
-        String SongDescription = "no current song"; //TODO: change to current Title of the song
-        Label songlabel = new Label(PREFIX_FOR_CURRENT_SONG + SongDescription);
+        songlabel = new Label(PREFIX_FOR_CURRENT_SONG + SongDescription);
 
-        if (parameters.size() != 0){
+        if (parameters.size() != 0) {
 
             String sparameters;
             sparameters = parameters.toString();
@@ -62,9 +64,7 @@ public class Player extends Application {
 
             PlayListPathname = sparameters;
             playlist.loadFromM3U(sparameters);
-        }
-
-        else {
+        } else {
             playlist.loadFromM3U(DEFAULT_PLAYLIST);
             playTime.setText(NO_PLAYTIME);
             primaryStage.setTitle(NO_CURRENT_SONG);
@@ -80,7 +80,7 @@ public class Player extends Application {
         primaryStage.setTitle(SongDescription);
 
         mainPane.setTop(songlabel);
-        ButtonBox.getChildren().addAll(playTime,playButton, pauseButton, stopButton, nextButton, editorButton);
+        ButtonBox.getChildren().addAll(playTime, playButton, pauseButton, stopButton, nextButton, editorButton);
         mainPane.setCenter(ButtonBox);
         primaryStage.show();
 
@@ -97,39 +97,97 @@ public class Player extends Application {
             nextSong();
         });
         editorButton.setOnAction(e -> {
-           // editCurrentPlaylist(); // Wird in der letzten Teilaufgabe implementiert
+            // editCurrentPlaylist(); // Wird in der letzten Teilaufgabe implementiert
         });
     }
 
     private void playCurrentSong() {
-       System.out.println( "Playing " + playlist.getCurrentAudioFile().toString());
-       System.out.println("Filename is " +playlist.getCurrentAudioFile().getFilename());
-       System.out.println("Index is " + playlist.getCurrent());
+        System.out.println("Playing " + playlist.getCurrentAudioFile().toString());
+        System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
+        System.out.println("Index is " + playlist.getCurrent());
+
+        //SongDescription = playlist.getCurrentAudioFile().toString(); //outdated
+        //playTime.setText(INITIAL_PLAYTIME); //outdated
+
+        updateSongInfo(playlist.getCurrentAudioFile());
+        stopped = false;
+        //studiplayer.basic.BasicPlayer.play(playlist.getCurrentAudioFile().getPathname()); //TODO: -//
+        //TODO: Initiate play song!
     }
 
-    private void pauseCurrentSong(){
+    private void pauseCurrentSong() {
         System.out.println("Pausing" + playlist.getCurrentAudioFile().toString());
-        System.out.println("Filename is " +playlist.getCurrentAudioFile().getFilename());
+        System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
         System.out.println("Index is " + playlist.getCurrent());
+
+        //studiplayer.basic.BasicPlayer.togglePause(); //TODO: -//
+        stopped = !stopped;
     }
 
-    private void stopCurrentSong(){
+    private void stopCurrentSong() {
         System.out.println("Stoping " + playlist.getCurrentAudioFile().toString());
-        System.out.println("Filename is " +playlist.getCurrentAudioFile().getFilename());
+        System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
         System.out.println("Index is " + playlist.getCurrent());
+
+        updateSongInfo(playlist.getCurrentAudioFile());
+        //studiplayer.basic.BasicPlayer.stop(); //TODO: -//
+        stopped = true;
+        //playTime.setText(INITIAL_PLAYTIME); //outdated
     }
 
-    private void nextSong(){
+    private void nextSong() {
+
+        if (!stopped) {
+            //studiplayer.basic.BasicPlayer.stop(); //TODO: -//
+            stopped = ! stopped;
+        }
+        System.out.println("Switching to next Audiofile...");
+        System.out.println("Stopping " +  playlist.getCurrentAudioFile().toString());
+        System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
+        System.out.println("Current index is " + playlist.getCurrent());
+
         playlist.changeCurrent();
-        System.out.println("Switching to next Audiofile " + playlist.getCurrentAudioFile().toString());
-        System.out.println("Filename is " +playlist.getCurrentAudioFile().getFilename());
-        System.out.println("Index is " + playlist.getCurrent());
+
+        playCurrentSong();
+
+
+
+
+
+        //SongDescription = playlist.getCurrentAudioFile().toString(); //outdated
+        //playTime.setText(INITIAL_PLAYTIME); //outdated
+        updateSongInfo(playlist.getCurrentAudioFile());
+        //studiplayer.basic.BasicPlayer.play(playlist.getCurrentAudioFile().getPathname()); //TODO: -//
+
     }
 
+    public void updateSongInfo(AudioFile af) { //TODO: Test ob auch Fenstertitel geändert wird.
+        if (af == null) {
+            SongDescription = NO_CURRENT_SONG;
+            songlabel.setText(PREFIX_FOR_CURRENT_SONG + SongDescription);
+            playTime.setText(NO_PLAYTIME);
+        }
+        SongDescription = af.toString();
 
-    private Button createButton(String iconfile){
+        songlabel.setText(PREFIX_FOR_CURRENT_SONG + SongDescription);
+        playTime.setText(INITIAL_PLAYTIME);
+    }
+/*    private void refreshUI(){
+        Platform.runLater(()-> {
+            if (playlist != null && playlist.size()>0){
+                updateSongInfo(playlist.getCurrentAudioFile());
+                setButtonStates(false, true, false ,true, false);
+            } else {
+                updateSongInfo(null);
+                setButtonStates(true, true, true, true, false);
+            }
+        });
+    }*/
+
+
+    private Button createButton(String iconfile) {
         Button button = null;
-        try{
+        try {
             URL url = getClass().getResource("/icons/" + iconfile);
             Image icon = new Image(url.toString());
             ImageView imageView = new ImageView(icon);
@@ -137,14 +195,14 @@ public class Player extends Application {
             imageView.setFitWidth(48);
             button = new Button("", imageView);
             button.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
-        }catch (Exception e){
-            System.out.println("Image "+"icons/" + iconfile + " not found!");
+        } catch (Exception e) {
+            System.out.println("Image " + "icons/" + iconfile + " not found!");
             System.exit(-1);
         }
         return button;
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         launch(args);
     }
 }
