@@ -99,6 +99,10 @@ public class Player extends Application {
         editorButton.setOnAction(e -> {
             // editCurrentPlaylist(); // Wird in der letzten Teilaufgabe implementiert
         });
+
+/*        playButton.setDisable(false); //redundant? */
+        pauseButton.setDisable(true);
+        stopButton.setDisable(true);
     }
 
     private void playCurrentSong() {
@@ -109,19 +113,38 @@ public class Player extends Application {
         //SongDescription = playlist.getCurrentAudioFile().toString(); //outdated
         //playTime.setText(INITIAL_PLAYTIME); //outdated
 
-        updateSongInfo(playlist.getCurrentAudioFile());
+
         stopped = false;
         //studiplayer.basic.BasicPlayer.play(playlist.getCurrentAudioFile().getPathname()); //TODO: -//
-        //TODO: Initiate play song!
+/*      playButton.setDisable(true);
+        pauseButton.setDisable(false);
+        stopButton.setDisable(false);*/
+
+        setButtonStates(true,false,false,false,false);
+
+        updateSongInfo(playlist.getCurrentAudioFile());
+
+
+
     }
 
     private void pauseCurrentSong() {
-        System.out.println("Pausing" + playlist.getCurrentAudioFile().toString());
+        System.out.println("Toggle 'pause'" + playlist.getCurrentAudioFile().toString());
+        switch (stopped+""){
+            case "false": System.out.println("---PAUSING---"); ; break;
+            case "true": ;System.out.println("---PLAYING---"); ;break;
+        }
         System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
         System.out.println("Index is " + playlist.getCurrent());
 
         //studiplayer.basic.BasicPlayer.togglePause(); //TODO: -//
         stopped = !stopped;
+        //pauseButton.setDisable(false);
+        //stopButton.setDisable(false);
+        //TODO: disable here play?
+
+        setButtonStates(true, false,false,false,false);
+
     }
 
     private void stopCurrentSong() {
@@ -133,16 +156,21 @@ public class Player extends Application {
         //studiplayer.basic.BasicPlayer.stop(); //TODO: -//
         stopped = true;
         //playTime.setText(INITIAL_PLAYTIME); //outdated
+        stopButton.setDisable(true);
+        pauseButton.setDisable(true);
+        playButton.setDisable(false);
+
+
     }
 
     private void nextSong() {
 
         if (!stopped) {
             //studiplayer.basic.BasicPlayer.stop(); //TODO: -//
-            stopped = ! stopped;
+            stopped = !stopped;
         }
         System.out.println("Switching to next Audiofile...");
-        System.out.println("Stopping " +  playlist.getCurrentAudioFile().toString());
+        System.out.println("Stopping " + playlist.getCurrentAudioFile().toString());
         System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
         System.out.println("Current index is " + playlist.getCurrent());
 
@@ -152,7 +180,8 @@ public class Player extends Application {
 
 
 
-
+        pauseButton.setDisable(false);
+        stopButton.setDisable(false);
 
         //SongDescription = playlist.getCurrentAudioFile().toString(); //outdated
         //playTime.setText(INITIAL_PLAYTIME); //outdated
@@ -172,7 +201,7 @@ public class Player extends Application {
         songlabel.setText(PREFIX_FOR_CURRENT_SONG + SongDescription);
         playTime.setText(INITIAL_PLAYTIME);
     }
-/*    private void refreshUI(){
+    private void refreshUI(){
         Platform.runLater(()-> {
             if (playlist != null && playlist.size()>0){
                 updateSongInfo(playlist.getCurrentAudioFile());
@@ -182,7 +211,19 @@ public class Player extends Application {
                 setButtonStates(true, true, true, true, false);
             }
         });
-    }*/
+    }
+
+    private void setButtonStates(boolean playButtonStat,
+                                 boolean stopButtonState, boolean nextButtonState,
+                                 boolean pauseButtonState, boolean editorButtonState) {
+        playButton.setDisable(playButtonStat);
+        stopButton.setDisable(stopButtonState);
+        nextButton.setDisable(nextButtonState);
+        pauseButton.setDisable(pauseButtonState);
+        editorButton.setDisable(editorButtonState);
+
+
+    }
 
 
     private Button createButton(String iconfile) {
