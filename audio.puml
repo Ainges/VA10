@@ -1,0 +1,100 @@
+@startuml
+class studiplayer.audio.WavFile {
++ String[] fields()
++ {static} long computeDuration(long,float)
++ void readAndSetDurationFromFile(String)
++ String toString()
+}
+abstract class studiplayer.audio.AudioFile {
+# String author
+# String title
+# long duration
+- String fileName
+- String pathname
+- boolean isWindowsPath
+- boolean isAbsolutPath
+- boolean isWindowsSystem
++ {abstract}void play()
++ {abstract}void togglePause()
++ {abstract}void stop()
++ {abstract}String getFormattedDuration()
++ {abstract}String getFormattedPosition()
++ {abstract}String[] fields()
++ void parsePathname(String)
+- String clearPath(String)
++ void parseFilename(String)
+- String separateFileName(String)
+- void UnixToWin(String)
+- void winToUnix(String)
+- void isWindowsPath(String)
+- void isWindowsSystem()
++ String getPathname()
++ String getFilename()
++ String getTitle()
++ void setTitle(String)
++ String getAuthor()
++ void setAuthor(String)
++ long getDuration()
++ void setDuration(long)
++ String toString()
+}
+class studiplayer.audio.DurationComparator {
++ int compare(AudioFile,AudioFile)
+}
+class studiplayer.audio.AlbumComparator {
++ int compare(AudioFile,AudioFile)
+}
+class studiplayer.audio.TaggedFile {
+- String album
++ String getAlbum()
++ void setAlbum(String)
++ void readAndStoreTags(String)
++ String[] fields()
++ String toString()
+}
+class studiplayer.audio.NotPlayableException {
+- String pathname
++ String toString()
+}
+abstract class studiplayer.audio.SampledFile {
++ void play()
++ void togglePause()
++ void stop()
++ String getFormattedDuration()
++ String getFormattedPosition()
++ {static} String timeFormatter(Long)
+}
+class studiplayer.audio.PlayList {
+- int current
+- boolean randomOrder
++ boolean isRandomOrder()
++ int getCurrent()
++ void setCurrent(int)
++ AudioFile getCurrentAudioFile()
++ void changeCurrent()
++ void setRandomOrder(boolean)
++ void saveAsM3U(String)
++ void loadFromM3U(String)
++ void sort(SortCriterion)
+}
+class studiplayer.audio.AudioFileFactory {
++ {static} AudioFile getInstance(String)
+}
+class studiplayer.audio.AuthorComparator {
++ int compare(AudioFile,AudioFile)
+}
+class studiplayer.audio.TitleComparator {
++ int compare(AudioFile,AudioFile)
+}
+
+
+studiplayer.audio.SampledFile <|-- studiplayer.audio.WavFile
+java.util.Comparator <|.. studiplayer.audio.DurationComparator
+java.util.Comparator <|.. studiplayer.audio.AlbumComparator
+studiplayer.audio.SampledFile <|-- studiplayer.audio.TaggedFile
+studiplayer.audio.Exception <|-- studiplayer.audio.NotPlayableException
+studiplayer.audio.AudioFile <|-- studiplayer.audio.SampledFile
+java.util.LinkedList <|-- studiplayer.audio.PlayList
+java.util.Comparator <|.. studiplayer.audio.AuthorComparator
+java.util.Comparator <|.. studiplayer.audio.TitleComparator
+@enduml

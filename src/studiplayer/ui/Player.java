@@ -29,7 +29,7 @@ public class Player extends Application {
     private String SongDescription = NO_CURRENT_SONG;
     private Label playTime = new Label(INITIAL_PLAYTIME);
     private Label songlabel;
-    private boolean stopped;
+    private volatile Boolean stopped;
 
     public static final String DEFAULT_PLAYLIST = "playlists/DefaultPlayList.m3u";
     private static final String INITIAL_PLAYTIME = "00:00";
@@ -100,33 +100,24 @@ public class Player extends Application {
             // editCurrentPlaylist(); // Wird in der letzten Teilaufgabe implementiert
         });
 
-/*        playButton.setDisable(false); //redundant? */
         pauseButton.setDisable(true);
         stopButton.setDisable(true);
     }
 
     private void playCurrentSong() {
-        System.out.println("Playing " + playlist.getCurrentAudioFile().toString());
-        System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
-        System.out.println("Index is " + playlist.getCurrent());
-
-        //SongDescription = playlist.getCurrentAudioFile().toString(); //outdated
-        //playTime.setText(INITIAL_PLAYTIME); //outdated
-
-
+        //System.out.println("Playing " + playlist.getCurrentAudioFile().toString());
+        //System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
+        //System.out.println("Index is " + playlist.getCurrent());
         stopped = false;
-        //studiplayer.basic.BasicPlayer.play(playlist.getCurrentAudioFile().getPathname()); //TODO: -//
-/*      playButton.setDisable(true);
-        pauseButton.setDisable(false);
-        stopButton.setDisable(false);*/
-
         setButtonStates(true,false,false,false,false);
-
         updateSongInfo(playlist.getCurrentAudioFile());
 
-
-
-    }
+        if (playlist.getCurrentAudioFile() != null) {
+            // Start threads
+            (new TimerThread()).start();
+            (new PlayerThread()).start();
+        }
+           }
 
     private void pauseCurrentSong() {
         System.out.println("Toggle 'pause'" + playlist.getCurrentAudioFile().toString());
@@ -137,14 +128,14 @@ public class Player extends Application {
         System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
         System.out.println("Index is " + playlist.getCurrent());
 
-        //studiplayer.basic.BasicPlayer.togglePause(); //TODO: -//
+        studiplayer.basic.BasicPlayer.togglePause();
         stopped = !stopped;
-        //pauseButton.setDisable(false);
-        //stopButton.setDisable(false);
-        //TODO: disable here play?
-
         setButtonStates(true, false,false,false,false);
-
+        if (playlist.getCurrentAudioFile() != null) {
+            // Start threads
+            (new TimerThread()).start();
+            (new PlayerThread()).start();
+        }
     }
 
     private void stopCurrentSong() {
@@ -152,8 +143,10 @@ public class Player extends Application {
         System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
         System.out.println("Index is " + playlist.getCurrent());
 
+        studiplayer.basic.BasicPlayer.stop();
+
         updateSongInfo(playlist.getCurrentAudioFile());
-        //studiplayer.basic.BasicPlayer.stop(); //TODO: -//
+
         stopped = true;
         //playTime.setText(INITIAL_PLAYTIME); //outdated
         stopButton.setDisable(true);
@@ -166,7 +159,7 @@ public class Player extends Application {
     private void nextSong() {
 
         if (!stopped) {
-            //studiplayer.basic.BasicPlayer.stop(); //TODO: -//
+            studiplayer.basic.BasicPlayer.stop();
             stopped = !stopped;
         }
         System.out.println("Switching to next Audiofile...");
@@ -186,7 +179,7 @@ public class Player extends Application {
         //SongDescription = playlist.getCurrentAudioFile().toString(); //outdated
         //playTime.setText(INITIAL_PLAYTIME); //outdated
         updateSongInfo(playlist.getCurrentAudioFile());
-        //studiplayer.basic.BasicPlayer.play(playlist.getCurrentAudioFile().getPathname()); //TODO: -//
+
 
     }
 
@@ -245,5 +238,40 @@ public class Player extends Application {
 
     public static void main(String[] args) {
         launch(args);
+    }
+
+    private class TimerThread extends Thread{
+
+        public void run(){
+            while (stopped == false && !playlist.isEmpty()){
+
+                String stest = playlist.getCurrentAudioFile().getFormattedPosition();
+
+                playTime.setText(stest);
+
+                try {
+                    sleep(100);
+                }
+                catch(Exception e ) {
+                    throw new RuntimeException("RuntimeException in TimerThread!");
+                }
+            }
+        }
+
+    }
+    private class PlayerThread extends Thread{
+        public void run(){
+            while (stopped == false && !playlist.isEmpty()){
+                try {
+                    studiplayer.basic.BasicPlayer.play(playlist.getCurrentAudioFile().getPathname());
+                    playlist.changeCurrent();//right spot?
+                    updateSongInfo(playlist.getCurrentAudioFile()); //right spot?
+                }catch (Exception e){
+                e.printStackTrace();
+                }
+
+            }
+        }
+
     }
 }
