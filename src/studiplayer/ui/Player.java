@@ -19,25 +19,30 @@ import java.util.List;
 
 public class Player extends Application {
 
+    public static final String DEFAULT_PLAYLIST = "playlists/DefaultPlayList.m3u";
+    private static final String INITIAL_PLAYTIME = "00:00";
+    private static final String PREFIX_FOR_CURRENT_SONG = "Current song: ";
+    private static final String NO_CURRENT_SONG = "no current song";
+    private static final String NO_PLAYTIME = "--:--";
     private Button playButton;
     private Button pauseButton;
     private Button stopButton;
     private Button nextButton;
     private Button editorButton;
     private PlayList playlist;
-    private String PlayListPathname; //Name was given (playListPathname?)
-    private String SongDescription = NO_CURRENT_SONG;
+    private String playListPathname; //Name was given (playListPathname?)
+    private String songDescription = NO_CURRENT_SONG;
     private Label playTime = new Label(INITIAL_PLAYTIME);
     private Label songlabel;
-    private volatile Boolean stopped;
-
-    public static final String DEFAULT_PLAYLIST = "playlists/DefaultPlayList.m3u";
-    private static final String INITIAL_PLAYTIME = "00:00";
-    private static final String PREFIX_FOR_CURRENT_SONG = "Current song: ";
-    private static final String NO_CURRENT_SONG = "no current song";
-    private static final String NO_PLAYTIME = "--:--";
+    private PlayListEditor playListEditor;
+    private volatile boolean stopped;
+    private boolean editorVisible;
 
     public Player() {
+    }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 
     //@Override
@@ -51,18 +56,21 @@ public class Player extends Application {
 
         playlist = new PlayList();
 
+        playListEditor = new PlayListEditor(this, this.playlist);
+        editorVisible = false;
+
 
         List<String> parameters = getParameters().getRaw();
-        songlabel = new Label(PREFIX_FOR_CURRENT_SONG + SongDescription);
+        songlabel = new Label(PREFIX_FOR_CURRENT_SONG + songDescription);
 
         if (parameters.size() != 0) {
 
             String sparameters;
             sparameters = parameters.toString();
 
-            SongDescription = parameters.toString();
+            songDescription = parameters.toString();
 
-            PlayListPathname = sparameters;
+            playListPathname = sparameters;
             playlist.loadFromM3U(sparameters);
         } else {
             playlist.loadFromM3U(DEFAULT_PLAYLIST);
@@ -77,7 +85,7 @@ public class Player extends Application {
         Scene scene = new Scene(mainPane, 700, 90);
         primaryStage.setScene(scene);
 
-        primaryStage.setTitle(SongDescription);
+        primaryStage.setTitle(songDescription);
 
         mainPane.setTop(songlabel);
         ButtonBox.getChildren().addAll(playTime, playButton, pauseButton, stopButton, nextButton, editorButton);
@@ -97,19 +105,25 @@ public class Player extends Application {
             nextSong();
         });
         editorButton.setOnAction(e -> {
-            // editCurrentPlaylist(); // Wird in der letzten Teilaufgabe implementiert
+            if (editorVisible) {
+                editorVisible = false;
+                playListEditor.hide();
+            } else {
+                editorVisible = true;
+                playListEditor.show();
+            }
         });
 
         pauseButton.setDisable(true);
         stopButton.setDisable(true);
     }
 
-    private void playCurrentSong() {
+    void playCurrentSong() {
         //System.out.println("Playing " + playlist.getCurrentAudioFile().toString());
         //System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
         //System.out.println("Index is " + playlist.getCurrent());
         stopped = false;
-        setButtonStates(true,false,false,false,false);
+        setButtonStates(true, false, false, false, false);
         updateSongInfo(playlist.getCurrentAudioFile());
 
         if (playlist.getCurrentAudioFile() != null) {
@@ -117,20 +131,27 @@ public class Player extends Application {
             (new TimerThread()).start();
             (new PlayerThread()).start();
         }
-           }
+    }
 
     private void pauseCurrentSong() {
         System.out.println("Toggle 'pause'" + playlist.getCurrentAudioFile().toString());
-        switch (stopped+""){
-            case "false": System.out.println("---PAUSING---"); ; break;
-            case "true": ;System.out.println("---PLAYING---"); ;break;
+        switch (stopped + "") {
+            case "false":
+                System.out.println("---PAUSING---");
+                ;
+                break;
+            case "true":
+                ;
+                System.out.println("---PLAYING---");
+                ;
+                break;
         }
         System.out.println("Filename is " + playlist.getCurrentAudioFile().getFilename());
         System.out.println("Index is " + playlist.getCurrent());
 
         studiplayer.basic.BasicPlayer.togglePause();
         stopped = !stopped;
-        setButtonStates(true, false,false,false,false);
+        setButtonStates(true, false, false, false, false);
         if (playlist.getCurrentAudioFile() != null) {
             // Start threads
             (new TimerThread()).start();
@@ -172,7 +193,6 @@ public class Player extends Application {
         playCurrentSong();
 
 
-
         pauseButton.setDisable(false);
         stopButton.setDisable(false);
 
@@ -185,20 +205,21 @@ public class Player extends Application {
 
     public void updateSongInfo(AudioFile af) { //TODO: Test ob auch Fenstertitel geändert wird.
         if (af == null) {
-            SongDescription = NO_CURRENT_SONG;
-            songlabel.setText(PREFIX_FOR_CURRENT_SONG + SongDescription);
+            songDescription = NO_CURRENT_SONG;
+            songlabel.setText(PREFIX_FOR_CURRENT_SONG + songDescription);
             playTime.setText(NO_PLAYTIME);
         }
-        SongDescription = af.toString();
+        songDescription = af.toString();
 
-        songlabel.setText(PREFIX_FOR_CURRENT_SONG + SongDescription);
+        songlabel.setText(PREFIX_FOR_CURRENT_SONG + songDescription);
         playTime.setText(INITIAL_PLAYTIME);
     }
-    private void refreshUI(){
-        Platform.runLater(()-> {
-            if (playlist != null && playlist.size()>0){
+
+    private void refreshUI() {
+        Platform.runLater(() -> {
+            if (playlist != null && playlist.size() > 0) {
                 updateSongInfo(playlist.getCurrentAudioFile());
-                setButtonStates(false, true, false ,true, false);
+                setButtonStates(false, true, false, true, false);
             } else {
                 updateSongInfo(null);
                 setButtonStates(true, true, true, true, false);
@@ -218,7 +239,6 @@ public class Player extends Application {
 
     }
 
-
     private Button createButton(String iconfile) {
         Button button = null;
         try {
@@ -236,14 +256,22 @@ public class Player extends Application {
         return button;
     }
 
-    public static void main(String[] args) {
-        launch(args);
+    public void setEditorVisible(boolean editorVisible) {
+        this.editorVisible = editorVisible;
     }
 
-    private class TimerThread extends Thread{
+    public String getPlayListPathname() {
+        return playListPathname;
+    }
 
-        public void run(){
-            while (stopped == false && !playlist.isEmpty()){
+    public void setPlayList(String s) {
+        this.playlist = new PlayList(s);
+    }
+
+    private class TimerThread extends Thread {
+
+        public void run() {
+            while (stopped == false && !playlist.isEmpty()) {
 
                 String stest = playlist.getCurrentAudioFile().getFormattedPosition();
 
@@ -251,27 +279,28 @@ public class Player extends Application {
 
                 try {
                     sleep(100);
-                }
-                catch(Exception e ) {
+                } catch (Exception e) {
                     throw new RuntimeException("RuntimeException in TimerThread!");
                 }
             }
         }
 
     }
-    private class PlayerThread extends Thread{
-        public void run(){
-            while (stopped == false && !playlist.isEmpty()){
+
+    private class PlayerThread extends Thread {
+        public void run() {
+            while (stopped == false && !playlist.isEmpty()) {
                 try {
                     studiplayer.basic.BasicPlayer.play(playlist.getCurrentAudioFile().getPathname());
                     playlist.changeCurrent();//right spot?
                     updateSongInfo(playlist.getCurrentAudioFile()); //right spot?
-                }catch (Exception e){
-                e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
             }
         }
 
     }
+
 }
