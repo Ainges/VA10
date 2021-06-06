@@ -128,6 +128,7 @@ public class Player extends Application {
         stopped = false;
         updateSongInfo(playList.getCurrentAudioFile());
 
+
         if (playList.getCurrentAudioFile() != null) {
             // Start threads
             (new TimerThread()).start();
@@ -139,26 +140,27 @@ public class Player extends Application {
         studiplayer.basic.BasicPlayer.togglePause();
         stopped = !stopped;
 
-        if (playList.getCurrentAudioFile() != null) {
+        /*if (playList.getCurrentAudioFile() != null) {
             // Start threads
             (new TimerThread()).start();
             (new PlayerThread()).start();
-        }
+        }*/
         setButtonStates(true, false, false, false, false);
     }
 
     private void stopCurrentSong() {
-        if (playList.getCurrentAudioFile() != null) {
+
+        /*if (playList.getCurrentAudioFile() != null) {
             // Start threads
             (new TimerThread()).start();
             (new PlayerThread()).start();
-        }
-        updateSongInfo(playList.getCurrentAudioFile());
-        studiplayer.basic.BasicPlayer.stop(); //Warum wird hier manchmal nicht gestopped?!
+        }*/
         stopped = true;
-        studiplayer.basic.BasicPlayer.togglePause();
-        playTime.setText(INITIAL_PLAYTIME);
+
+        studiplayer.basic.BasicPlayer.stop();
         setButtonStates(false, true, false, true, false);
+        updateSongInfo(playList.getCurrentAudioFile());
+        this.playTime.setText(INITIAL_PLAYTIME);
     }
 
     private void nextSong() {
@@ -170,11 +172,10 @@ public class Player extends Application {
         playList.changeCurrent();
         playCurrentSong();
         updateSongInfo(playList.getCurrentAudioFile());
-
         setButtonStates(true, false, false, false, false);
     }
 
-    public void updateSongInfo(AudioFile af) { //TODO: Test ob auch Fenstertitel geändert wird.
+    public void updateSongInfo(AudioFile af) {
         if (af == null) {
             songDescription.setText(NO_CURRENT_SONG);
             songlabel.setText(PREFIX_FOR_CURRENT_SONG + songDescription.getText());
@@ -246,9 +247,8 @@ public class Player extends Application {
         @Override
         public void run() {
             while (stopped && !playList.isEmpty()) {
-                //String stest = playList.getCurrentAudioFile().getFormattedPosition(); //for debugging
-                //playTime.setText(stest); //for debugging
-
+                String stest = playList.getCurrentAudioFile().getFormattedPosition(); //for debugging
+                playTime.setText(stest); //for debugging
                 try {
                     sleep(100);
                 } catch (Exception e) {
@@ -265,7 +265,7 @@ public class Player extends Application {
             while (stopped == false && !playList.isEmpty()) {
                 try {
                     studiplayer.basic.BasicPlayer.play(playList.getCurrentAudioFile().getPathname());
-                    playList.changeCurrent();//right spot?
+                    //playList.changeCurrent();//right spot? TODO: really //?
                     updateSongInfo(playList.getCurrentAudioFile()); //right spot?
                 } catch (Exception e) {
                     e.printStackTrace();
