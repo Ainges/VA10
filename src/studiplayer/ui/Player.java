@@ -32,7 +32,7 @@ public class Player extends Application {
     private PlayList playList;
     private String playListPathname; //Name was given (playListPathname?)
     private Label songDescription;
-    private final Label playTime = new Label(INITIAL_PLAYTIME);
+    private Label playTime;
     private Label songlabel;
     private Stage primaryStage;
     private PlayListEditor playListEditor;
@@ -61,6 +61,7 @@ public class Player extends Application {
         stopButton.setDisable(true);
 
         playList = new PlayList();
+        playTime = new Label();
 
         playListEditor = new PlayListEditor(this, this.playList);
         editorVisible = false;
@@ -160,7 +161,9 @@ public class Player extends Application {
         studiplayer.basic.BasicPlayer.stop();
         setButtonStates(false, true, false, true, false);
         updateSongInfo(playList.getCurrentAudioFile());
+
         this.playTime.setText(INITIAL_PLAYTIME);
+
     }
 
     private void nextSong() {
@@ -246,9 +249,10 @@ public class Player extends Application {
     private class TimerThread extends Thread {
         @Override
         public void run() {
-            while (stopped && !playList.isEmpty()) {
-                String stest = playList.getCurrentAudioFile().getFormattedPosition(); //for debugging
-                playTime.setText(stest); //for debugging
+            while (!stopped && !playList.isEmpty()) {
+//                String stest = playList.getCurrentAudioFile().getFormattedPosition(); //for debugging
+//                playTime.setText(stest); //for debugging
+                updateSongInfo(playList.getCurrentAudioFile());
                 try {
                     sleep(100);
                 } catch (Exception e) {
@@ -262,7 +266,7 @@ public class Player extends Application {
     private class PlayerThread extends Thread {
         @Override
         public void run() {
-            while (stopped == false && !playList.isEmpty()) {
+            while (!stopped && !playList.isEmpty()) {
                 try {
                     studiplayer.basic.BasicPlayer.play(playList.getCurrentAudioFile().getPathname());
                     //playList.changeCurrent();//right spot? TODO: really //?
