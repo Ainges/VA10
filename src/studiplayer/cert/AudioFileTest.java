@@ -20,7 +20,7 @@ import studiplayer.audio.WavFile;
 public class AudioFileTest {
 
     @SuppressWarnings("rawtypes")
-    private Class clazz = AudioFile.class;
+    private final Class clazz = AudioFile.class;
     char sepchar = java.io.File.separatorChar;
     private AudioFile f1;
     private AudioFile f2;

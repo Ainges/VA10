@@ -14,7 +14,7 @@ import studiplayer.ui.*;
 @SuppressWarnings("rawtypes")
 public class AttributesTest {
     // Liste aller Klassen
-    private Class[] clazzA = {
+    private final Class[] clazzA = {
             AlbumComparator.class,
             AudioFile.class,
             AudioFileFactory.class,

@@ -28,11 +28,12 @@ import studiplayer.audio.TaggedFile;
 
 public class PlayListEditor {
 
-	private Stage stage;
-	private Player player;
-	private PlayList playList;
+	private final Stage stage;
+	private final Player player;
+	private final PlayList playList;
 	private boolean rand = false;
-	private ImageView randOn, randOff;
+	private final ImageView randOn;
+	private final ImageView randOff;
 	private ObservableList<Song> tableData;
 	
 	public PlayListEditor(Player player, PlayList playList) {

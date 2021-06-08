@@ -51,10 +51,7 @@ public class NotPlayableExceptionTest {
         Class[] ex = meth.getExceptionTypes();
         if (ex.length == 0)
             return false;
-        if (studiplayer.audio.NotPlayableException.class.equals(ex[0])) {
-            return true;
-        }
-        return false;
+        return NotPlayableException.class.equals(ex[0]);
     }
 
     @SuppressWarnings("rawtypes")
@@ -62,10 +59,7 @@ public class NotPlayableExceptionTest {
         Class[] ex = meth.getExceptionTypes();
         if (ex.length == 0)
             return false;
-        if (studiplayer.audio.NotPlayableException.class.equals(ex[0])) {
-            return true;
-        }
-        return false;
+        return NotPlayableException.class.equals(ex[0]);
     }
 
     @SuppressWarnings("rawtypes")
@@ -74,17 +68,17 @@ public class NotPlayableExceptionTest {
         Method meth;
         Constructor ctor;
         try {
-            meth = AudioFile.class.getMethod("play", new Class[] {});
+            meth = AudioFile.class.getMethod("play");
             assertTrue(meth.getName()
                     + " deklariert keine NotPlayableException",
                     checkException(meth));
             ctor = AudioFile.class
-                    .getDeclaredConstructor(new Class[] { java.lang.String.class });
+                    .getDeclaredConstructor(String.class);
             assertTrue(ctor.getName()
                     + " deklariert keine NotPlayableException",
                     checkException(ctor));
             meth = AudioFileFactory.class.getMethod("getInstance",
-                    new Class[] { java.lang.String.class });
+                    String.class);
             assertTrue(meth.getName()
                     + " deklariert keine NotPlayableException",
                     checkException(meth));

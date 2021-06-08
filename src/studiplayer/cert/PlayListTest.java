@@ -20,7 +20,7 @@ import studiplayer.audio.TaggedFile;
 import studiplayer.audio.WavFile;
 
 public class PlayListTest {
-    private Class<PlayList> clazz = PlayList.class;
+    private final Class<PlayList> clazz = PlayList.class;
 
     // Check class hierarchy
     @Test

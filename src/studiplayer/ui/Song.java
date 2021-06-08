@@ -3,9 +3,12 @@ package studiplayer.ui;
 import studiplayer.audio.AudioFile;
 
 public class Song {
-	private int index;
-	private AudioFile af;
-	private String interpret, titel, album, laenge;
+	private final int index;
+	private final AudioFile af;
+	private final String interpret;
+    private final String titel;
+    private final String album;
+    private final String laenge;
 
 	public Song(int index, AudioFile af, String interpret, String titel, String album, String laenge) {
 		this.index = index;

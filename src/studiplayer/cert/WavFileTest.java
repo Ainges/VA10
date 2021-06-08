@@ -14,7 +14,7 @@ import studiplayer.audio.WavFile;
 
 public class WavFileTest {
     @SuppressWarnings("rawtypes")
-    private Class clazz = WavFile.class;
+    private final Class clazz = WavFile.class;
     private WavFile f1;
 
     @Before
@@ -40,7 +40,7 @@ public class WavFileTest {
     @Test
     public void testConstructor() {
         try {
-            clazz.getDeclaredConstructor(new Class[] { String.class });
+            clazz.getDeclaredConstructor(String.class);
         } catch (SecurityException e) {
             fail(e.toString());
         } catch (NoSuchMethodException e) {

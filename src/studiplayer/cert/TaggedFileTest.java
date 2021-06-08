@@ -14,7 +14,7 @@ import studiplayer.audio.TaggedFile;
 
 public class TaggedFileTest {
     @SuppressWarnings("rawtypes")
-    private Class clazz = TaggedFile.class;
+    private final Class clazz = TaggedFile.class;
     private TaggedFile f1;
     private TaggedFile f2;
 
@@ -42,7 +42,7 @@ public class TaggedFileTest {
     @Test
     public void testConstructor() {
         try {
-            clazz.getDeclaredConstructor(new Class[] { String.class });
+            clazz.getDeclaredConstructor(String.class);
         } catch (SecurityException e) {
             fail(e.toString());
         } catch (NoSuchMethodException e) {

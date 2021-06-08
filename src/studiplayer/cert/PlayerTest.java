@@ -40,10 +40,10 @@ public class PlayerTest {
 		}
 	}
 
-	private boolean debug = false;
+	private final boolean debug = false;
 	private static Thread playerThread = null;
 	private static Player playerRef = null;
-	private Class<Player> clazz = Player.class;
+	private final Class<Player> clazz = Player.class;
 
 	@Test
 	public void testDefaultPlaylist() {
@@ -353,7 +353,7 @@ public class PlayerTest {
 
 	private static void startApp() {
 		playerThread = new Thread(() -> {
-			Application.launch(PlayerToTest.class, new String[] {});
+			Application.launch(PlayerToTest.class);
 		});
 		playerThread.start();
 
