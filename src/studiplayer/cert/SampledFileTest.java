@@ -17,7 +17,7 @@ import studiplayer.basic.BasicPlayer;
 
 public class SampledFileTest {
     @SuppressWarnings("rawtypes")
-    private Class clazz = SampledFile.class;
+    private final Class clazz = SampledFile.class;
     private SampledFile f1;
     private SampledFile f2;
     private SampledFile f3;
@@ -53,7 +53,7 @@ public class SampledFileTest {
     @Test
     public void testConstructor() {
         try {
-            clazz.getDeclaredConstructor(new Class[] { String.class });
+            clazz.getDeclaredConstructor(String.class);
         } catch (SecurityException e) {
             fail(e.toString());
         } catch (NoSuchMethodException e) {

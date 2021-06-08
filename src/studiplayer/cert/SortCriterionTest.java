@@ -10,7 +10,7 @@ import studiplayer.audio.SortCriterion;
 public class SortCriterionTest {
 
     @SuppressWarnings("rawtypes")
-    private Class clazz = SortCriterion.class;
+    private final Class clazz = SortCriterion.class;
 
     @Test
     public void testEntries() {

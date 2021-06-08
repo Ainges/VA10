@@ -30,7 +30,7 @@ public class Player extends Application {
     private Button nextButton;
     private Button editorButton;
     private PlayList playList;
-    private String playListPathname; //Name was given (playListPathname?)
+    private String playListPathname;
     private Label songDescription;
     private Label playTime;
     private Label songlabel;
@@ -59,29 +59,27 @@ public class Player extends Application {
 
         pauseButton.setDisable(true);
         stopButton.setDisable(true);
+        editorVisible = false;
 
         playList = new PlayList();
         playTime = new Label();
-
         playListEditor = new PlayListEditor(this, this.playList);
-        editorVisible = false;
         songDescription = new Label();
         songDescription.setText(NO_CURRENT_SONG);
-
+        songlabel = new Label(PREFIX_FOR_CURRENT_SONG + songDescription.getText());
+        BorderPane mainPane = new BorderPane();
+        HBox ButtonBox = new HBox();
+        Scene scene = new Scene(mainPane, 700, 90);
 
         List<String> parameters = getParameters().getRaw();
-        songlabel = new Label(PREFIX_FOR_CURRENT_SONG + songDescription.getText());
-
         if (parameters.size() != 0) {
-
             String sparameters;
             sparameters = parameters.toString();
-
             songDescription.setText(parameters.toString());
-
             playListPathname = sparameters;
             playList.loadFromM3U(sparameters);
         }
+
         if (parameters == null) {
             playList.loadFromM3U(DEFAULT_PLAYLIST);
             playTime.setText(NO_PLAYTIME);
@@ -92,20 +90,15 @@ public class Player extends Application {
             primaryStage.setTitle(NO_CURRENT_SONG);
         }
 
-        BorderPane mainPane = new BorderPane();
-        HBox ButtonBox = new HBox();
-
-        Scene scene = new Scene(mainPane, 700, 90);
         this.primaryStage = primaryStage;
         primaryStage.setScene(scene);
-
         this.primaryStage.setTitle(songDescription.getText());
-
         mainPane.setTop(songlabel);
         ButtonBox.getChildren().addAll(playTime, playButton, pauseButton, stopButton, nextButton, editorButton);
         mainPane.setCenter(ButtonBox);
         primaryStage.show();
 
+        //Event handler
         playButton.setOnAction(e -> playCurrentSong());
         pauseButton.setOnAction(e -> pauseCurrentSong());
         stopButton.setOnAction(e -> stopCurrentSong());
@@ -119,8 +112,6 @@ public class Player extends Application {
                 playListEditor.show();
             }
         });
-
-
     }
 
     void playCurrentSong() {
@@ -128,8 +119,6 @@ public class Player extends Application {
         setButtonStates(true, false, false, false, false);
         stopped = false;
         updateSongInfo(playList.getCurrentAudioFile());
-
-
         if (playList.getCurrentAudioFile() != null) {
             // Start threads
             (new TimerThread()).start();
@@ -140,28 +129,15 @@ public class Player extends Application {
     private void pauseCurrentSong() {
         studiplayer.basic.BasicPlayer.togglePause();
         stopped = !stopped;
-
-        /*if (playList.getCurrentAudioFile() != null) {
-            // Start threads
-            (new TimerThread()).start();
-            (new PlayerThread()).start();
-        }*/
         setButtonStates(true, false, false, false, false);
     }
 
     private void stopCurrentSong() {
 
-        /*if (playList.getCurrentAudioFile() != null) {
-            // Start threads
-            (new TimerThread()).start();
-            (new PlayerThread()).start();
-        }*/
         stopped = true;
-
         studiplayer.basic.BasicPlayer.stop();
         setButtonStates(false, true, false, true, false);
         updateSongInfo(playList.getCurrentAudioFile());
-
         this.playTime.setText(INITIAL_PLAYTIME);
 
     }
@@ -199,21 +175,19 @@ public class Player extends Application {
             } else {
                 updateSongInfo(null);
                 setButtonStates(true, true, true, true, false);
-
             }
         });
     }
 
     private void setButtonStates(boolean playButtonStat,
                                  boolean stopButtonState, boolean nextButtonState,
-                                 boolean pauseButtonState, boolean editorButtonState) {
+                                 boolean pauseButtonState, boolean editorButtonState)
+    {
         playButton.setDisable(playButtonStat);
         stopButton.setDisable(stopButtonState);
         nextButton.setDisable(nextButtonState);
         pauseButton.setDisable(pauseButtonState);
         editorButton.setDisable(editorButtonState);
-
-
     }
 
     private Button createButton(String iconfile) {
@@ -250,8 +224,6 @@ public class Player extends Application {
         @Override
         public void run() {
             while (!stopped && !playList.isEmpty()) {
-//                String stest = playList.getCurrentAudioFile().getFormattedPosition(); //for debugging
-//                playTime.setText(stest); //for debugging
                 updateSongInfo(playList.getCurrentAudioFile());
                 try {
                     sleep(100);
@@ -260,7 +232,6 @@ public class Player extends Application {
                 }
             }
         }
-
     }
 
     private class PlayerThread extends Thread {
@@ -269,15 +240,11 @@ public class Player extends Application {
             while (!stopped && !playList.isEmpty()) {
                 try {
                     studiplayer.basic.BasicPlayer.play(playList.getCurrentAudioFile().getPathname());
-                    //playList.changeCurrent();//right spot? TODO: really //?
-                    updateSongInfo(playList.getCurrentAudioFile()); //right spot?
+                    updateSongInfo(playList.getCurrentAudioFile());
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-
             }
         }
-
     }
-
 }
