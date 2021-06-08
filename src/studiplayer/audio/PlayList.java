@@ -98,6 +98,10 @@ public class PlayList extends LinkedList<AudioFile> {
     }
 
     public void loadFromM3U(String pathname) {
+
+        if (pathname == null || pathname.isBlank()){
+            return;
+        }
         this.clear();
         Scanner scanner = null;
         String line;
